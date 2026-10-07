@@ -16,6 +16,36 @@ update.
 
 The tool lands at `~/.optmem/memo`; put `~/.optmem` on `PATH` to type `memo`.
 
+## memo-safe
+
+This fork adds `memo-safe`: a `memo` wrapper that strips accents (ASCII) and
+truncates the text to 280 bytes before saving. Without it, accented words
+(e.g. Portuguese) cost 2 bytes per character and `memo note` rejects the
+line, leading to trial and error.
+
+Install (fetches `memo` from upstream and `memo-safe` from this fork):
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/mbaptista10/OptMem/main/install.sh | sh
+```
+
+It only intercepts `note` and `nap` with text; everything else (`wake`,
+`recall`, `zoom`, `forget`, `config`) is passed through untouched.
+
+```sh
+~/.optmem/memo-safe note "Decision: migration completed in production"
+~/.optmem/memo-safe nap 0-1 "Node summary"
+```
+
+In the `## Memory` block of `CLAUDE.md`/`AGENTS.md`, replace the two writing
+lines:
+
+```markdown
+Call `~/.optmem/memo-safe note "<1 line, max 280 chars>"` whenever you learn
+...
+If `~/.optmem/memo-safe note` asks a compression: do it with `~/.optmem/memo-safe nap <lo>-<hi> "<line>"` before your next action.
+```
+
 ## Commands
 
 | | |

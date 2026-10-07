@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+"""Wrapper for ~/.optmem/memo: strips accents (ASCII) and truncates to 280 bytes.
+
+Removes the trial and error of the byte limit. Only intercepts the commands
+that write text -- note and nap with text -- and passes everything else
+(wake, recall, zoom, forget, config, import) through untouched.
+
+  memo-safe note "<text>"
+  memo-safe nap <lo>-<hi> "<text>"
+  memo-safe wake            # passed through as is
+"""
+
+import os
+import sys
+import unicodedata
+
+MEMO = os.path.expanduser("~/.optmem/memo")
+LIMIT = 280  # memo ENTRY_CHARS
+
+
+def clean(text):
+    ascii_text = unicodedata.normalize("NFKD", text).encode("ascii", "ignore")
+    return ascii_text[:LIMIT].decode("ascii")
+
+
+def rewrite(argv):
+    if len(argv) == 2 and argv[0] == "note":
+        return ["note", clean(argv[1])]
+    if len(argv) == 3 and argv[0] == "nap":
+        return ["nap", argv[1], clean(argv[2])]
+    return argv
+
+
+def main():
+    os.execv(MEMO, [MEMO] + rewrite(sys.argv[1:]))
+
+
+if __name__ == "__main__":
+    main()
